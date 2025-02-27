@@ -86,18 +86,6 @@ def login():
 def tweets():
     return render_template("tweets.html")
 
-#感情認識
-@app.route("/predict", methods=['GET','POST'])
-def predict():
-    if request.method=='GET':
-        return render_template('predict.html')
-    elif request.method=='POST':
-        quote=request.form['name']
-        result=predict_sentiment(quote)
-        label = result[0]['label']
-        score = result[0]['score']
-        scorepersent=math.floor(score*100)
-        return render_template('predict.html',quote=quote,label=label,score=scorepersent)
 
 @app.route("/users")
 def user_list():
@@ -136,12 +124,20 @@ def user_detail(id):
 
 @app.route('/quiz',  methods=['GET','POST'], endpoint='quiz')
 
+
+def select_question(weights):
+        candidates=[i for i, W in weights.items() if W >= 0.5]
+        if candidates:
+            return random.choice(candidates)
+        else:
+            return random.randint(0, len(questions)-1)
+        
 def quiz():
     if 'question_weights' not in session:
-        session['question_weights']={i: 1.0 for i in range(len(questions))}
+        session['question_weights'] = {i : 1.0 for i in range(len(questions))}
 
     if 'current_question' not in session:
-        session['current_question']=select_question(session['question_weights'])
+        session['current_question'] = select_question(session['question_weights'])
         
     current_question_index = session['current_question']
     current_question = questions[current_question_index]
@@ -152,27 +148,22 @@ def quiz():
 
         if selected_answer==correct_answer:
             feedback="正解です！"
-            session['question_weights'][current_question_index]-=0.1
+            session['question_weights'][current_question_index] -= 0.1
         else:
             feedback="不正解です!"
-            session['question_weights'][current_question_index]+=0.2
+            session['question_weights'][current_question_index] += 0.2
         
         session['question_weights'][current_question_index]=max(0,session['question_weights'][current_question_index])
 
         next_question = select_question(session['question_weights'])
-        session['current_question']= next_question
+        session['current_question'] = next_question
         explanation = current_question["explanation"]
 
-        return render_template('quiz.html',question=questions[next_question], feedback=feedback, explanation=explanation)
+        return render_template('quiz.html',question = questions[next_question], feedback = feedback, explanation = explanation)
         
     return render_template('quiz.html', question=questions[session['current_question']])
 
-def select_question(weights):
-        candidates=[i for i, W in weights.items() if W >= 0.5]
-        if candidates:
-            return random.choice(candidates)
-        else:
-            return random.randint(0,len(questions)-1)
+
 
   
 
