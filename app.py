@@ -8,7 +8,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import LoginManager, UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-from model import predict_sentiment
 from questions import questions
 import numpy as np
 import datetime
@@ -121,26 +120,26 @@ def user_detail(id):
     user=db.get_or_404(User,id)
     return render_template("user/detail.html",user=user)
 
-
-@app.route('/quiz',  methods=['GET','POST'], endpoint='quiz')
-
-
 def select_question(weights):
-        candidates=[i for i, W in weights.items() if W >= 0.5]
+        candidates=[int(i) for i, W in weights.items() if float(W) >= 0.5]
         if candidates:
             return random.choice(candidates)
         else:
-            return random.randint(0, len(questions)-1)
+            return random.randint(0, len(questions) - 1)
         
+@app.route('/quiz',  methods=['GET','POST'], endpoint='quiz')
+
+              
 def quiz():
     if 'question_weights' not in session:
-        session['question_weights'] = {i : 1.0 for i in range(len(questions))}
+        session['question_weights'] = {str(i) : 0.5 for i in range(len(questions))}
 
     if 'current_question' not in session:
         session['current_question'] = select_question(session['question_weights'])
         
-    current_question_index = session['current_question']
-    current_question = questions[current_question_index]
+    current_question_index = str(session['current_question'])
+
+    current_question = questions[int(current_question_index)]
 
     if request.method=='POST':
         selected_answer=request.form.get('answer')
@@ -148,24 +147,24 @@ def quiz():
 
         if selected_answer==correct_answer:
             feedback="正解です！"
-            session['question_weights'][current_question_index] -= 0.1
+            session['question_weights'][str(current_question_index)] -= 0.1
         else:
             feedback="不正解です!"
-            session['question_weights'][current_question_index] += 0.2
+            session['question_weights'][str(current_question_index)] += 0.2
         
-        session['question_weights'][current_question_index]=max(0,session['question_weights'][current_question_index])
+        session['question_weights'][current_question_index]=max(0, min(1,session['question_weights'][current_question_index]))
 
         next_question = select_question(session['question_weights'])
         session['current_question'] = next_question
         explanation = current_question["explanation"]
 
+        session.modified=True
+
         return render_template('quiz.html',question = questions[next_question], feedback = feedback, explanation = explanation)
         
-    return render_template('quiz.html', question=questions[session['current_question']])
+    return render_template('quiz.html', question=questions[int(session['current_question'])])
 
 
-
-  
 
 @app.route('/review')
 def review():
