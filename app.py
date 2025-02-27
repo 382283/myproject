@@ -135,12 +135,6 @@ def user_detail(id):
 
 
 @app.route('/quiz',  methods=['GET','POST'], endpoint='quiz')
-def select_question(weights):
-        candidates=[i for i, W in weights.items() if W >= 0.5]
-        if candidates:
-            return random.choice(candidates)
-        else:
-            return random.randint(0,len(questions)-1)
 
 def quiz():
     if 'question_weights' not in session:
@@ -165,13 +159,20 @@ def quiz():
         
         session['question_weights'][current_question_index]=max(0,session['question_weights'][current_question_index])
 
-        next_question=select_question(session['queston_weights'])
-        session['current_question']=next_question
+        next_question = select_question(session['question_weights'])
+        session['current_question']= next_question
         explanation = current_question["explanation"]
 
         return render_template('quiz.html',question=questions[next_question], feedback=feedback, explanation=explanation)
         
     return render_template('quiz.html', question=questions[session['current_question']])
+
+def select_question(weights):
+        candidates=[i for i, W in weights.items() if W >= 0.5]
+        if candidates:
+            return random.choice(candidates)
+        else:
+            return random.randint(0,len(questions)-1)
 
   
 
