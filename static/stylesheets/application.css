@@ -1,0 +1,31 @@
+* {
+    margin: 0;
+    padding: 0;
+  }
+#header_title{
+  margin: 10px;
+}
+ul{
+  list-style: none;
+  display: flex;
+  margin: 20px;
+}
+li a{
+  color: white;
+  text-decoration: none;
+  list-style: none;
+  margin:10px;
+}
+header{
+    height: 60px;
+    background-color: #133db1;
+    color:white ;
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+}
+.title_explain{
+  width:500px;
+  height:300px;
+  
+}

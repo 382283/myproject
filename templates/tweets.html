@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweets</title>
+</head>
+
+<body>
+    {% extends "application.html" %}
+    {% block content%}
+    <div class="content">
+        <h1>判定する言葉を入力しよう！</h1>
+        <form action="/predict" method="POST">
+            <input type="text" name="name">
+            <input type="submit" value='送信'>
+        </form>
+    </div>
+    {% endblock %}
+</body>
+</html>

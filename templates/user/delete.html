@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー削除</title>
+</head>
+<body>
+    <h1>{{ user.username }} を削除しますか？</h1>
+    <form method="POST">
+        <button type="submit">削除</button>
+    </form>
+    <a href="{{ url_for('user_list') }}">ユーザー一覧に戻る</a>
+</body>
+</html>

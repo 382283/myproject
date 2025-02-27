@@ -1,0 +1,25 @@
+
+/* 画面全体を中央配置するための親コンテナ */
+.login {
+    height: calc(100vh - 60px); /* 100vh から header の高さを引く */
+    display: flex; /* Flexbox を適用 */
+    justify-content: center; /* 水平方向の中央揃え */
+    align-items: center; /* 垂直方向の中央揃え */
+  }
+  
+  /* ログインフォームのデザイン */
+  .login_container {
+    width: 300px;
+    padding: 20px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+  
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  }
+  

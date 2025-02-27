@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー一覧</title>
+    <link rel="stylesheet" href="../static/stylesheets/list.css">
+    <link rel="stylesheet" href="../static/stylesheets/application.css">
+</head>
+<body>
+
+    {% extends "application.html" %}
+    {% block content%}
+    <h1>ユーザー一覧</h1>
+    <ul>
+        {% for user in users %}
+            
+                {{ user.username }} - <a href="{{ url_for('user_detail', id=user.id) }}">詳細</a>
+                - <a href="{{ url_for('user_delete', id=user.id) }}">削除</a>
+            
+        {% endfor %}
+    </ul>
+    {% endblock %}
+</body>
+</html>

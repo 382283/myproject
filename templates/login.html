@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/stylesheets/login.css">
+
+    <title>ログイン</title>
+</head>
+<body>
+    {% extends "application.html" %}
+    
+    {% block content %}
+        <!-- エラーメッセージを表示 -->
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <div class="login">
+            <div class="login_container">
+                <div class="login_form">
+                    
+                    <form method="POST">
+                        <div class="textfield">
+                            <label for="username">ユーザー名</label>
+                        </div>
+                        <div class="textfield">
+                            <input type="text" id="username" name="username" required><br>
+                        </div> 
+                        <div class="textfield">             
+                            <label for="password">パスワード</label>
+                        </div>     
+                        <div class="textfield">
+                            <input type="password" id="password" name="password" required><br>
+                        </div>
+                        
+                        <button type="submit">ログイン</button>                     
+                    </form>
+                </div>
+    
+                <div class="login_signup">
+                    <a href="{{ url_for('signup') }}">サインアップ</a>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+    
+</body>
+</html>
