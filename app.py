@@ -158,17 +158,14 @@ def quiz():
         session['current_question'] = next_question
         explanation = current_question["explanation"]
 
+        
         session.modified=True
 
         return render_template('quiz.html',question = questions[next_question], feedback = feedback, explanation = explanation)
         
-    return render_template('quiz.html', question=questions[int(session['current_question'])])
+    return render_template('quiz.html', question = questions[int(session['current_question'])])
 
 
-
-@app.route('/review')
-def review():
-    return render_template('review.html')
 
 @app.route("/user/<int:id>/delete",methods=["GET","POST"])
 def user_delete(id):

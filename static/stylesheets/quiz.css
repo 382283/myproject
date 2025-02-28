@@ -1,0 +1,18 @@
+label {
+    display: block;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+label:hover {
+    background-color: #f0f0f0;
+}
