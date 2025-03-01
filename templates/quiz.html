@@ -1,25 +1,18 @@
 <!DOCTYPE html>
-<html lang="jp">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/stylesheets/quiz.css">
+    <title>クイズ</title>
 </head>
 <body>
-    <form method="POST">
-        <p>{{question['question']}}</p>
-        {% for option in question['options'] %}
-            <label>
-                <input type="radio" name="answer" value="{{ option }}">
-                {{ option }}
-            </label><br>
+    <h1>{{ question['question'] }}</h1>
+    <form action="/review" method="post">
+        {% for choice in question['options'] %}
+        <input type="radio" name="answer" value="{{ choice }}"> {{ choice }}<br>
         {% endfor %}
         <button type="submit">回答</button>
     </form>
-    {% if feedback %}
-        <p><strog>{{ feedback }}</strog></p>
-        <p>解説: {{ explanation }}</p>
-    {% endif %}
 </body>
 </html>
+

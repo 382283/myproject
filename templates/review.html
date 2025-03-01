@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>レビュー</title>
-
+    <title>回答結果</title>
 </head>
 <body>
-    <h2>レビュー</h2>
-    <p>あなたの選択: <strong>{{ selected_answer }}</strong></p>
-    <p>正解: <strong>{{ correct_answer }}</strong></p>
-    <p><strong>{{ feedback }}</strong></p>
-    <p>解説: {{ explanation }}</p>
-
-    <a href="{{ url_for('quiz') }}">次の問題へ</a>
+    <h1>{{ feedback }}</h1>
+    <p>{{ explanation }}</p>
+    <form action="/next_question" method="post">
+        <button type="submit">次の問題へ</button>
+    </form>
 </body>
 </html>

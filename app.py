@@ -127,44 +127,43 @@ def select_question(weights):
         else:
             return random.randint(0, len(questions) - 1)
         
-@app.route('/quiz',  methods=['GET','POST'], endpoint='quiz')
-
-              
+@app.route('/quiz',methods=['GET'])
 def quiz():
     if 'question_weights' not in session:
-        session['question_weights'] = {str(i) : 0.5 for i in range(len(questions))}
+        session['question_weights'] = {str(i): 0.5 for i in range(len(questions))}
 
     if 'current_question' not in session:
         session['current_question'] = select_question(session['question_weights'])
-        
-    current_question_index = str(session['current_question'])
 
+    current_question_index = str(session['current_question'])
     current_question = questions[int(current_question_index)]
 
-    if request.method=='POST':
-        selected_answer=request.form.get('answer')
-        correct_answer = current_question["answer"]
+    return render_template('quiz.html', question=current_question)
 
-        if selected_answer==correct_answer:
-            feedback="正解です！"
-            session['question_weights'][str(current_question_index)] -= 0.1
-        else:
-            feedback="不正解です!"
-            session['question_weights'][str(current_question_index)] += 0.2
-        
-        session['question_weights'][current_question_index]=max(0, min(1,session['question_weights'][current_question_index]))
+@app.route('/review', methods=['POST'])
+def review():
+    selected_answer = request.form.get('answer')
+    current_question_index = str(session['current_question'])
+    current_question = questions[int(current_question_index)]
+    correct_answer = current_question["answer"]
 
-        next_question = select_question(session['question_weights'])
-        session['current_question'] = next_question
-        explanation = current_question["explanation"]
+    if selected_answer == correct_answer:
+        feedback = "正解です！！"
+        session['question_weights'][current_question_index] -= 0.1
+    else:
+        feedback = "不正解です!!"
+        session['question_weights'][current_question_index] += 0.2
 
-        
-        session.modified=True
+    session['question_weights'][current_question_index] = max(0, min(1, session['question_weights'][current_question_index]))
 
-        return render_template('quiz.html',question = questions[next_question], feedback = feedback, explanation = explanation)
-        
-    return render_template('quiz.html', question = questions[int(session['current_question'])])
+    session.modified = True
 
+    return render_template('review.html', question=current_question, feedback=feedback, explanation=current_question["explanation"])
+
+@app.route('/next_question', methods=['POST'])
+def next_question():
+    session['current_question'] = select_question(session['question_weights'])
+    return redirect(url_for('quiz'))
 
 
 @app.route("/user/<int:id>/delete",methods=["GET","POST"])
