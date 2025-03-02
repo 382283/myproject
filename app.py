@@ -150,15 +150,28 @@ def review():
     if selected_answer == correct_answer:
         feedback = "正解です！！"
         session['question_weights'][current_question_index] -= 0.1
+        session['correct_answers'] =session.get('correct_answers', 0) + 1
     else:
         feedback = "不正解です!!"
         session['question_weights'][current_question_index] += 0.2
 
     session['question_weights'][current_question_index] = max(0, min(1, session['question_weights'][current_question_index]))
 
+
+    if 'solved_questions' not in session:
+        session['solved_questions'] = []
+
+    if int(current_question_index) not in session['solved_questions']:
+        session['solved_questions'].append(int(current_question_index))
+
+    total_solved = len(session['solved_questions'])
+    correct_answers = session.get('correct_answers', 0)
+    accuracy = round(correct_answers / total_solved * 100, 1) if total_solved > 0 else 0
+
     session.modified = True
 
-    return render_template('review.html', question=current_question, feedback=feedback, explanation=current_question["explanation"])
+    return render_template('review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),
+                           accuracy=accuracy)
 
 @app.route('/next_question', methods=['POST'])
 def next_question():

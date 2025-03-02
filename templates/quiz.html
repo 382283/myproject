@@ -6,6 +6,7 @@
     <title>クイズ</title>
 </head>
 <body>
+    
     <h1>{{ question['question'] }}</h1>
     <form action="/review" method="post">
         {% for choice in question['options'] %}
