@@ -9,6 +9,7 @@ from flask_login import LoginManager, UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from questions import questions
+from QLearning import QLearning
 import numpy as np
 import datetime
 import os
@@ -120,49 +121,47 @@ def user_detail(id):
     user=db.get_or_404(User,id)
     return render_template("user/detail.html",user=user)
 
-def select_question(weights):
-        candidates=[int(i) for i, W in weights.items() if float(W) >= 0.5]
-        if candidates:
-            return random.choice(candidates)
-        else:
-            return random.randint(0, len(questions) - 1)
-        
+num_questions = len(questions)
+q1 = QLearning(num_questions)
+
+def select_question():
+    return q1.select_action()
+              
 @app.route('/quiz',methods=['GET'])
 def quiz():
-    if 'question_weights' not in session:
-        session['question_weights'] = {str(i): 0.5 for i in range(len(questions))}
-
     if 'current_question' not in session:
-        session['current_question'] = select_question(session['question_weights'])
+        session['current_question'] = int(select_question())
 
-    current_question_index = str(session['current_question'])
-    current_question = questions[int(current_question_index)]
+    current_question_index = int(session['current_question'])
+    current_question = questions[current_question_index]
 
-    return render_template('quiz.html', question=current_question)
+    return render_template('quiz.html', question = current_question)
 
 @app.route('/review', methods=['POST'])
 def review():
+
     selected_answer = request.form.get('answer')
-    current_question_index = str(session['current_question'])
-    current_question = questions[int(current_question_index)]
+    current_question_index = int(session['current_question'])
+    current_question = questions[current_question_index]
     correct_answer = current_question["answer"]
 
     if selected_answer == correct_answer:
         feedback = "正解です！！"
-        session['question_weights'][current_question_index] -= 0.1
-        session['correct_answers'] =session.get('correct_answers', 0) + 1
+        reward = 1
+        session['correct_answers'] = session.get('correct_answers', 0) + 1
     else:
         feedback = "不正解です!!"
-        session['question_weights'][current_question_index] += 0.2
+        reward = -1
 
-    session['question_weights'][current_question_index] = max(0, min(1, session['question_weights'][current_question_index]))
-
+    next_question = int(select_question())
+    q1.update_q_value(current_question_index, reward, next_question)
+    session['current_question'] = next_question
 
     if 'solved_questions' not in session:
         session['solved_questions'] = []
 
-    if int(current_question_index) not in session['solved_questions']:
-        session['solved_questions'].append(int(current_question_index))
+    if 'solved_question_index' not in session['solved_questions']:
+        session['solved_questions'].append(current_question_index)
 
     total_solved = len(session['solved_questions'])
     correct_answers = session.get('correct_answers', 0)
@@ -170,12 +169,11 @@ def review():
 
     session.modified = True
 
-    return render_template('review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),
-                           accuracy=accuracy)
+    return render_template('review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),accuracy=accuracy)
 
 @app.route('/next_question', methods=['POST'])
 def next_question():
-    session['current_question'] = select_question(session['question_weights'])
+    session['current_question'] = int(select_question())
     return redirect(url_for('quiz'))
 
 
