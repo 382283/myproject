@@ -35,13 +35,7 @@ p {
     border-radius: 8px;
 }
 
-.correct {
-    background-color: #4CAF50;
-}
 
-.incorrect {
-    background-color: #f44336;
-}
 
 form {
     text-align: center;
@@ -52,7 +46,7 @@ button[type="submit"] {
     width: 100%;
     padding: 12px;
     font-size: 18px;
-    background-color: #4CAF50;
+    background-color: #133db1;
     color: white;
     border: none;
     border-radius: 8px;

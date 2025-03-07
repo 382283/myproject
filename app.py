@@ -147,11 +147,11 @@ def review():
 
     if selected_answer == correct_answer:
         feedback = "正解です！！"
-        reward = 1
+        reward = +1
         session['correct_answers'] = session.get('correct_answers', 0) + 1
     else:
         feedback = "不正解です!!"
-        reward = -1
+        reward = 1
 
     next_question = int(select_question())
     q1.update_q_value(current_question_index, reward, next_question)

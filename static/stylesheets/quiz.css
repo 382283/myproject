@@ -54,16 +54,16 @@ label:hover {
 
 /* ラジオボタンが選択されたときのスタイル */
 input[type="radio"]:checked + label {
-    background-color: #4CAF50;
+    background-color: #133db1;
     color: white;
-    border-color: #4CAF50;
+    border-color: #133db1;
 }
 
 /* ボタン */
 button {
     padding: 10px;
     font-size: 18px;
-    background-color: #4CAF50;
+    background-color: #133db1;
     color: white;
     border: none;
     border-radius: 8px;
@@ -72,5 +72,5 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #133db1;
 }
