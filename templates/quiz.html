@@ -4,16 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>クイズ</title>
+    <!-- CSSを関連付け -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/quiz.css') }}">
 </head>
 <body>
-    
-    <h1>{{ question['question'] }}</h1>
-    <form action="/review" method="post">
-        {% for choice in question['options'] %}
-        <input type="radio" name="answer" value="{{ choice }}"> {{ choice }}<br>
-        {% endfor %}
-        <button type="submit">回答</button>
-    </form>
+
+    <div class="quiz-container">
+        <h1>{{ question['question'] }}</h1>
+        <form action="/review" method="post">
+            {% for choice in question['options'] %}
+                <input type="radio" id="choice{{ loop.index }}" name="answer" value="{{ choice }}">
+                <label for="choice{{ loop.index }}">{{ choice }}</label>
+            {% endfor %}
+            <button type="submit">回答</button>
+        </form>
+    </div>
+
 </body>
 </html>
+
 

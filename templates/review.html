@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>回答結果</title>
+    <!-- CSSを関連付け -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/review.css') }}">
 </head>
 <body>
-    <p>正答率： {{ accuracy }} </p>
-    <h1>{{ feedback }}</h1>
-    <p>{{ explanation }}</p>
-    <form action="/next_question" method="post">
-        <button type="submit">次の問題へ</button>
-    </form>
+    <div class="review-container">
+        <p>正答率： {{ accuracy }}</p>
+        <div class="feedback {{ 'correct' if accuracy >= 80 else 'incorrect' }}">
+            <h1>{{ feedback }}</h1>
+        </div>
+        <p>{{ explanation }}</p>
+        <form action="/next_question" method="post">
+            <button type="submit">次の問題へ</button>
+        </form>
+    </div>
 </body>
 </html>

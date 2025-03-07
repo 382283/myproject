@@ -1,0 +1,65 @@
+/* review.css */
+
+/* 全体レイアウト */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+p {
+    font-size: 20px;
+    color: #555;
+    text-align: center;
+}
+
+.feedback {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.correct {
+    background-color: #4CAF50;
+}
+
+.incorrect {
+    background-color: #f44336;
+}
+
+form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}

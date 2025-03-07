@@ -1,3 +1,41 @@
+/* クイズページ全体のスタイル */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.quiz-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* タイトル */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* フォームのスタイル */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* ラジオボタンを隠す */
+input[type="radio"] {
+    display: none;
+}
+
+/* 選択肢ボタン風のスタイル */
 label {
     display: block;
     font-size: 18px;
@@ -6,13 +44,33 @@ label {
     border: 2px solid #ccc;
     cursor: pointer;
     transition: all 0.3s ease;
+    background-color: #fff;
 }
 
-input[type="radio"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
+/* ホバー時のエフェクト */
 label:hover {
     background-color: #f0f0f0;
+}
+
+/* ラジオボタンが選択されたときのスタイル */
+input[type="radio"]:checked + label {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+/* ボタン */
+button {
+    padding: 10px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
 }
