@@ -4,9 +4,9 @@ import numpy as np
 class QLearning:
     def __init__(self, num_questions, alpha = 0.1, gamma = 0.9, epsilon = 0.1):
         self.q_table = np.zeros(num_questions)
-        self.alpha = alpha
-        self.gamma = gamma
-        self.epsilon = epsilon
+        self.alpha = alpha #学習率
+        self.gamma = gamma #割引率
+        self.epsilon = epsilon #探索率
     
     def select_action(self):
         if random.random() < self.epsilon:
@@ -20,4 +20,3 @@ class QLearning:
 
     def get_q_table(self):
         return self.q_table
-

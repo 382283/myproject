@@ -1,4 +1,3 @@
-<!-- application.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}アプリケーション{% endblock %}</title>
     <link rel="stylesheet" href="static/stylesheets/application.css">
-    
 </head>
 <body>
     <header>
         <div id="header_title">
-            <h1>G検定勉強サイト</h1>
+            <h1>Python勉強サイト</h1>
         </div>
         <div id="header_list">
             <nav>
@@ -21,29 +19,24 @@
                     <li><a href="{{ url_for('login') }}">ログイン</a></li>
                 </ul>
             </nav>
-            </div>
+        </div>
     </header>
     <main>
         {% block content %}
         <div class="home">
             <div class="home_title">
-                <h1>G検定勉強サイト</h1>
+                <h1>Python勉強サイト</h1>
             </div>
 
-                <div class="title_explain">
-                    <p></p>
-                </div>
-                <div class="title_explain">
-                    <p> 今、自分はどのくらい進んでいるのか？
-                        そんな疑問をすぐに解決！このアプリでは、目標までの進捗を可視化し、次に何をすべきかを明確にします。やるべきことを整理し、一歩ずつ確実に前進しましょう
-                    </p>
-                    <a href="{{ url_for('signup') }}">サインアップ</a>
-                    <a href="{{ url_for('login') }}">ログイン</a>
-                </div>
-                <div class="title_explain">
-                    <p>モヤモヤした気持ちを言葉にしてみると、意外とスッキリするもの。このアプリは、あなたの気持ちを書き出し、整理するお手伝いをします。考えを整理して、次に進む一歩を見つけましょう！</p>
-                </div>
+            <div class="title_explain">
+                <p>なぜPython?? 理由を適当に考えて</p>
+                <a href="{{ url_for('signup') }}" class="cta-btn">サインアップ</a>
+                <a href="{{ url_for('login') }}" class="cta-btn">ログイン</a>
+            </div>
 
+            <div class="title_explain">
+                <p>4択クイズで楽しく学べる</p>
+            </div>
         </div>
         {% endblock %}
     </main>

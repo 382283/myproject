@@ -1,25 +1,92 @@
-
 /* 画面全体を中央配置するための親コンテナ */
 .login {
-    height: calc(100vh - 60px); /* 100vh から header の高さを引く */
-    display: flex; /* Flexbox を適用 */
-    justify-content: center; /* 水平方向の中央揃え */
-    align-items: center; /* 垂直方向の中央揃え */
-  }
-  
-  /* ログインフォームのデザイン */
-  .login_container {
-    width: 300px;
-    padding: 20px;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 20px;
-  
-    border: 2px solid black;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-  }
-  
+  height: calc(100vh - 60px); /* 100vh から header の高さを引く */
+  display: flex; /* Flexbox を適用 */
+  justify-content: center; /* 水平方向の中央揃え */
+  align-items: center; /* 垂直方向の中央揃え */
+}
+
+/* ログインフォームのデザイン */
+.login_container {
+  width: 400px; /* フォームを大きくした */
+  padding: 30px; /* 内側に余白を追加 */
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+
+  border: 2px solid #133db1; /* メインカラーで枠線 */
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* フォームフィールド（ラベルと入力フィールド） */
+.textfield {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.textfield label {
+  font-size: 1.1em;
+  color: #444; /* サブカラー */
+}
+
+.textfield input {
+  padding: 12px;
+  font-size: 1.1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.3s;
+}
+
+.textfield input:focus {
+  border-color: #133db1; /* メインカラー（青） */
+  outline: none;
+}
+
+/* ボタン */
+button {
+  padding: 14px;
+  font-size: 1.2em;
+  background-color: #133db1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #ffcc00; /* アクセントカラー（黄色） */
+}
+
+/* サインアップリンク */
+.login_signup {
+  text-align: center;
+}
+
+.login_signup a {
+  color: #133db1;
+  text-decoration: none;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.login_signup a:hover {
+  color: #ffcc00; /* アクセントカラー（黄色） */
+}
+
+/* エラーメッセージのスタイル */
+.alert_denger {
+  color: red;
+  font-size: 1.2em;
+  text-align: center;
+  margin-bottom: 20px;
+}
