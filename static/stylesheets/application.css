@@ -1,100 +1,121 @@
-/* リセット */
+/* 基本のリセット */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: white;
-  color: #333;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #152637;
+    color: #fff;
 }
 
-/* ヘッダー */
 header {
-  height: 60px;
-  background-color: #133db1; /* 青色 */
-  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 1rem;
 }
 
-#header_title h1 {
-  font-size: 1.8em;
+header .logo {
+  flex: 1;
 }
 
-#header_list nav ul {
+header .logo h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+header nav ul {
   display: flex;
-  list-style: none;
+  list-style-type: none;
+  padding: 0;
 }
 
-#header_list nav ul li {
-  margin-left: 20px;
+header nav ul li {
+  margin-left: 2rem; /* ナビゲーションアイテム間のスペース */
 }
 
-#header_list nav ul li a {
-  color: white;
+header nav ul li a {
+  color: #fff;
   text-decoration: none;
-  font-size: 1.1em;
-  transition: color 0.3s;
+  font-size: 1.1rem;
 }
 
-#header_list nav ul li a:hover {
-  color: #ffcc00; /* アクセントカラー（黄色） */
+header nav ul li a:hover {
+  text-decoration: underline;
 }
 
-/* メインコンテンツ */
-.home {
-  padding: 40px;
-  text-align: center;
+
+main {
+    padding: 2rem 0;
+    text-align: center;
 }
 
-.home_title h1 {
-  font-size: 2.5em;
-  margin-bottom: 30px;
-  color: #133db1; /* メインカラー（青） */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
-.title_explain {
-  margin-bottom: 30px;
-  font-size: 1.2em;
+.hero-content {
+    flex: 1;
+    text-align: left;
 }
 
-.title_explain p {
-  margin-bottom: 20px;
-  color: #555; /* サブテキスト色（ダークグレー） */
+.hero-content h2 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
 }
 
 .cta-btn {
   display: inline-block;
-  background-color: #133db1; /* メインカラー（青） */
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
+  background: linear-gradient(45deg, #9b4de8, #f96b9d); /* 紫からピンクへのグラデーション */
+  color: #0a0f43;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
   text-decoration: none;
-  font-weight: bold;
-  margin: 10px;
-  transition: background-color 0.3s;
+  border-radius: 1000px;
+  transition: background 0.3s, transform 0.3s; /* グラデーションの変化と拡大縮小 */
 }
 
 .cta-btn:hover {
-  background-color: #ffcc00; /* アクセントカラー（黄色） */
-}
-
-/* その他のスタイリング */
-.title_explain a {
-  margin: 0 15px;
+  background: linear-gradient(45deg, #7a34b3, #e74c97); /* ホバー時に少し色を暗く */
+  transform: scale(1.05); /* ホバー時にボタンを少し拡大 */
   color: #fff;
-  background-color: #444;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background-color 0.3s;
 }
 
-.title_explain a:hover {
-  background-color: #ffcc00;
+
+.hero-image {
+    flex: 1;
+    text-align: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-content {
+        margin-bottom: 2rem;
+    }
 }

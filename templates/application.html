@@ -3,42 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}アプリケーション{% endblock %}</title>
-    <link rel="stylesheet" href="static/stylesheets/application.css">
+    <title>{% block title %}Python勉強サイト{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/application.css') }}">
 </head>
 <body>
-    <header>
-        <div id="header_title">
-            <h1>Python勉強サイト</h1>
-        </div>
-        <div id="header_list">
+    <div class="content-wrapper">
+        <header>
+            <div class="logo">
+                <h1>Python勉強サイト</h1>
+            </div>
             <nav>
                 <ul>
-                    <li><a href="{{ url_for('user_list') }}">ユーザー一覧</a></li>
                     <li><a href="{{ url_for('signup') }}">サインアップ</a></li>
                     <li><a href="{{ url_for('login') }}">ログイン</a></li>
                 </ul>
             </nav>
-        </div>
-    </header>
-    <main>
-        {% block content %}
-        <div class="home">
-            <div class="home_title">
-                <h1>Python勉強サイト</h1>
-            </div>
-
-            <div class="title_explain">
-                <p>なぜPython?? 理由</p>
-                <a href="{{ url_for('signup') }}" class="cta-btn">サインアップ</a>
-                <a href="{{ url_for('login') }}" class="cta-btn">ログイン</a>
-            </div>
-
-            <div class="title_explain">
-                <p>4択クイズで楽しく学べる</p>
-            </div>
-        </div>
-        {% endblock %}
-    </main>
+        </header>
+        
+        <main>
+            {% block content %}
+                <section class="hero">
+                    <div class="hero-content">
+                        <h2>時代の先端を駆け抜ける</h2>
+                        <p>4択クイズで楽しくPythonを学ぼう</p>
+                        <a href="{{ url_for('signup') }}" class="cta-btn">詳しくはこちら</a>
+                    </div>
+                    <div class="hero-image">
+                        <img src="{{ url_for('static', filename='images/hero-image.png') }}" alt="学習アプリのイメージ">
+                    </div>
+                </section>
+            {% endblock %}
+        </main>
+    </div>
 </body>
+
 </html>
