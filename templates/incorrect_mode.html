@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>間違えた問題モード</title>
+</head>
+<body>
+    <h1>間違えた問題モードに切り替えました</h1>
+    <form action="/incorrect_mode" method="POST">
+        <button type="submit">間違えた問題のみを選択</button>
+    </form>
+    <br>
+    <form action="{{ url_for('index') }}" method="GET">
+        <button type="submit">モード選択に戻る</button>
+    </form>
+</body>
+</html>

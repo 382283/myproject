@@ -1,1 +1,23 @@
-!
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイズセット選択</title>
+</head>
+<body>
+    <h1>クイズセットを選択してください</h1>
+    <form method="post">
+        <label>
+            <input type="radio" name="select_set" value="question_0" checked> Pythonの特徴
+        </label>
+        <label>
+            <input type="radio" name="select_set" value="question_1"> 人工知能の基礎
+        </label>
+        <button type="submit">スタート</button>
+    </form>
+    <form method="POST" action="{{ url_for('incorrect_mode') }}">
+        間違えた問題を復習する
+    </form>
+</body>
+</html>

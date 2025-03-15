@@ -76,7 +76,7 @@ def login():
 
         if check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for('quiz'))
+            return redirect(url_for('index'))
         else:
             error_message = "ユーザー名またはパスワードが間違っています。"
             return render_template('login.html', error=error_message)
@@ -121,11 +121,44 @@ def user_detail(id):
     user=db.get_or_404(User,id)
     return render_template("user/detail.html",user=user)
 
+@app.route("/user/<int:id>/delete",methods=["GET","POST"])
+def user_delete(id):
+    user=db.get_or_404(User, id)
+
+    if request.method=="POST":
+        db.session.delete(user)
+        db.session.commit()
+        return redirect(url_for("user_list"))
+    return render_template("user/delete.html", user=user)
+
+@app.route("/index", methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        session['selected_set'] = request.form['select_set']
+        session['incorrect_mode'] = False
+        return redirect(url_for('quiz'))
+    return render_template("index.html")
+
+def get_questions_by_set(select_set):
+    return [q for q in questions if q['select_set'] ==  select_set]
+
 num_questions = len(questions)
 q1 = QLearning(num_questions)
 
 def select_question():
-    return q1.select_action()
+    if 'solved_questions' not in session:
+        session['solved_questions'] = []     
+    if 'incorrect_questions' not in session:
+        session['incorrect_questions'] = []
+
+    if session.get('incorrect_mode', False):
+        unanswered_questions = [i for i in range(len(questions)) if i not in session['solved_questions']]
+    else:
+        unanswered_questions = list(range(len(questions)))
+    if unanswered_questions:
+        return random.choice(unanswered_questions)
+    else:
+        return random.choice(range(len(questions)))
               
 @app.route('/quiz',methods=['GET'])
 def quiz():
@@ -152,6 +185,8 @@ def review():
     else:
         feedback = "不正解です!!"
         reward = 1
+        if current_question_index not in session['incorrect_questions']:
+            session['incorrect_questions'].append(current_question_index)
 
     next_question = int(select_question())
     q1.update_q_value(current_question_index, reward, next_question)
@@ -171,22 +206,18 @@ def review():
 
     return render_template('review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),accuracy=accuracy)
 
+
 @app.route('/next_question', methods=['POST'])
 def next_question():
     session['current_question'] = int(select_question())
     return redirect(url_for('quiz'))
 
+@app.route('/incorrect_mode',methods=['POST'])
+def incorrect_mode():
+    session['incorrect_mode'] = True
+    session['solved_questions'] = []
+    return redirect(url_for('quiz'))
 
-@app.route("/user/<int:id>/delete",methods=["GET","POST"])
-def user_delete(id):
-    user=db.get_or_404(User, id)
-
-    if request.method=="POST":
-        db.session.delete(user)
-        db.session.commit()
-        return redirect(url_for("user_list"))
-    return render_template("user/delete.html", user=user)
-    
 if __name__ == "__main__":
    
     app.run(debug=True)
