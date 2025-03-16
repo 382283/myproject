@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/review.css') }}">
 </head>
 <body>
+        {% extends "logined.html" %}
+        {% block content %}
     <div class="review-container">
         <p>正答率： {{ accuracy }}</p>
         <div class="feedback {{ 'correct' if accuracy >= 80 else 'incorrect' }}">
@@ -18,5 +20,6 @@
             <button type="submit">次の問題へ</button>
         </form>
     </div>
+    {% endblock %}
 </body>
 </html>

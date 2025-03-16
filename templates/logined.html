@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Python勉強サイト{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/logined.css') }}">
+</head>
+<body>
+    <div class="content-wrapper">
+        <header>
+            <div class="logo">
+                <h1>Python勉強サイト</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">モード選択</a></li>
+                    <li><a href="{{ url_for('login') }}">ログアウト</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+</body>
+
+</html>
+

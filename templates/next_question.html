@@ -8,8 +8,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/next_question.css') }}">
 </head>
 <body>
+    
+        {% extends "logined.html" %}
+        {% block content %}
     <form action="/next_question" method="post">
         <button type="submit">次の問題へ</button>
     </form>
+    {% endblock %}
 </body>
 </html>

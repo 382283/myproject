@@ -8,16 +8,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/quiz.css') }}">
 </head>
 <body>
+    
 
-    <div class="quiz-container">
-        <h1>{{ question['question'] }}</h1>
-        <form action="/review" method="post">
-            {% for choice in question['options'] %}
-                <input type="radio" id="choice{{ loop.index }}" name="answer" value="{{ choice }}">
-                <label for="choice{{ loop.index }}">{{ choice }}</label>
-            {% endfor %}
-            <button type="submit">回答</button>
-        </form>
+    
+        {% extends "logined.html" %}
+        {% block content %}
+        <div class="quiz-container">
+            <h1>{{ question['question'] }}</h1>
+            <form action="/review" method="post">
+                {% for choice in question['options'] %}
+                    <input type="radio" id="choice{{ loop.index }}" name="answer" value="{{ choice }}">
+                    <label for="choice{{ loop.index }}">{{ choice }}</label>
+                {% endfor %}
+                <button type="submit">回答</button>
+            </form>
+        </div>
+        {% endblock %}
     </div>
 
 </body>

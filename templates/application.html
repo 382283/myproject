@@ -26,10 +26,17 @@
                     <div class="hero-content">
                         <h2>時代の先端を駆け抜ける</h2>
                         <p>4択クイズで楽しくPythonを学ぼう</p>
-                        <a href="{{ url_for('signup') }}" class="cta-btn">詳しくはこちら</a>
+                        <a href="{{ url_for('signup') }}" class="cta-btn-dark">サインアップ</a>
+                        <a href="{{ url_for('login') }}" class="cta-btn">ログイン</a>
                     </div>
                     <div class="hero-image">
-                        <img src="{{ url_for('static', filename='images/hero-image.png') }}" alt="学習アプリのイメージ">
+                        <img src="{{ url_for('static', filename='stylesheets/images/image.png') }}" alt="学習アプリのイメージ">
+                    </div>
+                </section>
+                <section class="explain">
+                    <div class="explain-content">
+                        <h2>なぜPythonをまなぶのか</h2>
+                        <p></p>
                     </div>
                 </section>
             {% endblock %}

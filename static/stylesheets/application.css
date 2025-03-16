@@ -1,15 +1,28 @@
 /* 基本のリセット */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-    background-color: #152637;
-    color: #fff;
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  background: url("/static/stylesheets/images/background_image.jpeg") no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* コンテンツ全体をスクロール可能に */
+.content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  background: rgba(21, 38, 55, 0.8); /* 背景を半透明に */
+  padding: 2rem;
 }
 
 header {
@@ -35,7 +48,7 @@ header nav ul {
 }
 
 header nav ul li {
-  margin-left: 2rem; /* ナビゲーションアイテム間のスペース */
+  margin-left: 2rem;
 }
 
 header nav ul li a {
@@ -48,74 +61,100 @@ header nav ul li a:hover {
   text-decoration: underline;
 }
 
-
 main {
-    padding: 2rem 0;
-    text-align: center;
+  padding: 2rem 0;
+  text-align: center;
 }
 
 .hero {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .hero-content {
-    flex: 1;
-    text-align: left;
+  flex: 1;
+  text-align: left;
+  opacity: 0.9; /* コンテンツの透明度を下げる */
 }
 
 .hero-content h2 {
-    font-size: 2.5rem;
-    color: #fff;
-    margin-bottom: 1rem;
+  font-size: 2.5rem;
+  color: #fff;
+  margin-bottom: 1rem;
 }
 
 .hero-content p {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .cta-btn {
   display: inline-block;
-  background: linear-gradient(45deg, #9b4de8, #f96b9d); /* 紫からピンクへのグラデーション */
+  background: linear-gradient(45deg, #9b4de8, #f96b9d);
   color: #0a0f43;
   padding: 0.8rem 1.5rem;
   font-size: 1.1rem;
   text-decoration: none;
   border-radius: 1000px;
-  transition: background 0.3s, transform 0.3s; /* グラデーションの変化と拡大縮小 */
+  transition: background 0.3s, transform 0.3s;
 }
 
 .cta-btn:hover {
-  background: linear-gradient(45deg, #7a34b3, #e74c97); /* ホバー時に少し色を暗く */
-  transform: scale(1.05); /* ホバー時にボタンを少し拡大 */
+  background: linear-gradient(45deg, #7a34b3, #e74c97);
+  transform: scale(1.05);
   color: #fff;
 }
 
+.cta-btn-dark {
+  display: inline-block;
+  background: linear-gradient(45deg, #0a0f43, #1e3a5f); /* 紺色のグラデーション */
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  text-decoration: none;
+  border-radius: 1000px;
+  transition: background 0.3s, transform 0.3s;
+}
 
+.cta-btn-dark:hover {
+  background: linear-gradient(45deg, #091030, #162c4d); /* さらに暗い紺色 */
+  transform: scale(1.05);
+  color: #f0f0f0;
+}
+
+.cta-btn,
+.cta-btn-dark {
+  margin: 0 1rem; /* 左右の間隔を少し広げる */
+}
+
+.hero-content a {
+  display: inline-block;
+  margin-bottom: 1rem; /* ボタンの上下に間隔を追加 */
+}
 .hero-image {
-    flex: 1;
-    text-align: center;
+  flex: 1;
+  text-align: center;
+  opacity: 0.9;
 }
 
 .hero-image img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 50px;
 }
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
-    .hero {
-        flex-direction: column;
-        text-align: center;
-    }
+  .hero {
+      flex-direction: column;
+      text-align: center;
+  }
 
-    .hero-content {
-        margin-bottom: 2rem;
-    }
+  .hero-content {
+      margin-bottom: 2rem;
+  }
 }
