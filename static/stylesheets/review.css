@@ -36,15 +36,19 @@ p {
 }
 
 
-
+.review-container{
+    background-color: #f4f7fc;
+    border-radius: 20px;
+}
 form {
     text-align: center;
     margin-top: 30px;
 }
 
 button[type="submit"] {
-    width: 100%;
+    width: 90%;
     padding: 12px;
+    margin:10px;
     font-size: 18px;
     background-color: #133db1;
     color: white;

@@ -65,7 +65,7 @@ def load_user(user_id):
 #User一覧の表示
 @app.route("/")
 def main():
-    return render_template("application.html")
+    return render_template("user/application.html")
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -79,12 +79,12 @@ def login():
             return redirect(url_for('index'))
         else:
             error_message = "ユーザー名またはパスワードが間違っています。"
-            return render_template('login.html', error=error_message)
-    return render_template('login.html')
+            return render_template('user/login.html', error=error_message)
+    return render_template('user/login.html')
         
 @app.route("/tweets")
 def tweets():
-    return render_template("tweets.html")
+    return render_template("main/tweets.html")
 
 
 @app.route("/users")
@@ -137,7 +137,7 @@ def index():
         session['selected_set'] = request.form['select_set']
         session['incorrect_mode'] = False
         return redirect(url_for('quiz'))
-    return render_template("index.html")
+    return render_template("main/index.html")
 
 def get_questions_by_set(select_set):
     return [q for q in questions if q['select_set'] ==  select_set]
@@ -152,7 +152,7 @@ def select_question():
         session['incorrect_questions'] = []
 
     if session.get('incorrect_mode', False):
-        unanswered_questions = [i for i in range(len(questions)) if i not in session['solved_questions']]
+        unanswered_questions = [i for i in session['incorrect_questions'] if i not in session['solved_questions']]
     else:
         unanswered_questions = list(range(len(questions)))
     if unanswered_questions:
@@ -168,7 +168,7 @@ def quiz():
     current_question_index = int(session['current_question'])
     current_question = questions[current_question_index]
 
-    return render_template('quiz.html', question = current_question)
+    return render_template('main/quiz.html', question = current_question)
 
 @app.route('/review', methods=['POST'])
 def review():
@@ -192,10 +192,7 @@ def review():
     q1.update_q_value(current_question_index, reward, next_question)
     session['current_question'] = next_question
 
-    if 'solved_questions' not in session:
-        session['solved_questions'] = []
-
-    if 'solved_question_index' not in session['solved_questions']:
+    if 'currenr_question_index' not in session['solved_questions']:
         session['solved_questions'].append(current_question_index)
 
     total_solved = len(session['solved_questions'])
@@ -204,7 +201,7 @@ def review():
 
     session.modified = True
 
-    return render_template('review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),accuracy=accuracy)
+    return render_template('main/review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),accuracy=accuracy)
 
 
 @app.route('/next_question', methods=['POST'])

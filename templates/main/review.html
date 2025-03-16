@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/review.css') }}">
 </head>
 <body>
-        {% extends "logined.html" %}
+        {% extends "main/logined.html" %}
         {% block content %}
     <div class="review-container">
         <p>正答率： {{ accuracy }}</p>
