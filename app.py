@@ -178,6 +178,7 @@ def review():
     current_question = questions[current_question_index]
     correct_answer = current_question["answer"]
 
+    # 正解の場合と不正解の場合の処理
     if selected_answer == correct_answer:
         feedback = "正解です！！"
         reward = -1
@@ -188,20 +189,30 @@ def review():
         if current_question_index not in session['incorrect_questions']:
             session['incorrect_questions'].append(current_question_index)
 
+    # 次の問題を選択
     next_question = int(select_question())
     q1.update_q_value(current_question_index, reward, next_question)
     session['current_question'] = next_question
 
-    if 'currenr_question_index' not in session['solved_questions']:
+    # 解答済み問題リストに現在の問題を追加
+    if current_question_index not in session['solved_questions']:
         session['solved_questions'].append(current_question_index)
 
+    # 解答済みと正解数を元に正答率を計算
     total_solved = len(session['solved_questions'])
     correct_answers = session.get('correct_answers', 0)
-    accuracy = round(correct_answers / total_solved * 100, 1) if total_solved > 0 else 0
+
+    # ゼロ除算を避けるため、total_solved > 0 のときだけ計算
+    if total_solved > 0:
+        accuracy = round(correct_answers / total_solved * 100, 1)
+    else:
+        accuracy = 0  # 解答がない場合は0%
 
     session.modified = True
 
-    return render_template('main/review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),accuracy=accuracy)
+    return render_template('main/review.html', question=current_question, feedback=feedback, 
+                           explanation=current_question["explanation"], solved_count=len(session['solved_questions']),
+                           total_questions=len(questions), accuracy=accuracy)
 
 
 @app.route('/next_question', methods=['POST'])

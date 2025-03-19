@@ -30,15 +30,23 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
+  list-style: none;
 }
 
 header .logo {
   flex: 1;
+  
 }
 
 header .logo h1 {
   font-size: 2rem;
   margin: 0;
+}
+
+header .logo a {
+  color: white;
+  font-size: 2rem;
+  text-decoration: none;
 }
 
 header nav ul {
