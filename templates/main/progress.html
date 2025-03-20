@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>進捗状況</title>
+</head>
+<body>
+    <h1>進捗状況</h1>
+
+    <canvas id="progressChart"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById("progressChart").getContext("2d");
+        var progressChart = new Chart(ctx, {
+            type: "bar",  // グラフの種類（棒グラフ）
+            data: {
+                labels: {{ labels | tojson }},  // Flask から渡されたラベル（セクション名）
+                datasets: [{
+                    label: "正答率 (%)",  // グラフのラベル
+                    data: {{ data | tojson }},  // Flask から渡されたデータ（正答率）
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",  // バーの背景色
+                    borderColor: "rgba(75, 192, 192, 1)",  // バーの枠線の色
+                    borderWidth: 1  // 枠線の太さ
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,  // Y軸を0から始める
+                        max: 100  // Y軸の最大値を100に設定
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

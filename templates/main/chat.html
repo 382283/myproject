@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python学習チャットボット</title>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Python学習チャットボット</h2>
+        <!-- チャットの履歴を表示 -->
+        <div id="chat-box">
+            {% for message in chat_messages %}
+                <div class="message {{ message.sender }}">
+                    <strong>{{ message.sender }}:</strong> {{ message.text }}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- フォーム -->
+        <form id="chat-form" method="POST">
+            <label for="user_input">質問を入力:</label>
+            <input type="text" id="user_input" name="user_input" required>
+            <button type="submit">送信</button>
+        </form>
+    </div>
+
+    <script>
+        // フォームの送信時に非同期でリクエストを送信
+        document.getElementById("chat-form").addEventListener("submit", async function(event) {
+            event.preventDefault();  // フォーム送信を防ぐ
+            const userInput = document.getElementById("user_input").value;
+            if (!userInput) return; // 空の場合は送信しない
+
+            // ユーザーのメッセージを表示
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="message user"><strong>あなた:</strong> ${userInput}</div>`;
+
+            // APIへリクエストを送る
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userInput })
+            });
+
+            const data = await response.json();
+            const botResponse = data.response || "エラーが発生しました。";
+
+            // ボットの回答を表示
+            chatBox.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${botResponse}</div>`;
+
+            // 入力欄をクリア
+            document.getElementById("user_input").value = "";
+            chatBox.scrollTop = chatBox.scrollHeight; // 最新のメッセージを表示
+        });
+    </script>
+</body>
+</html>
+

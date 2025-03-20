@@ -5,12 +5,15 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from flask_login import LoginManager, UserMixin, login_user
+from flask_login import LoginManager, UserMixin, login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from transformers import pipeline
 from questions import questions
 from QLearning import QLearning
+from flask_login import logout_user
 import numpy as np
+import requests
 import datetime
 import os
 import math
@@ -53,6 +56,13 @@ class LearningProgress(db.Model):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'))
     topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topic.id'))
     date_learned: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    correct_count: Mapped[int] = mapped_column(Integer, default=0)  # 正解数
+    total_count: Mapped[int] = mapped_column(Integer, default=0)    # 解いた問題数
+    avg_time: Mapped[float] = mapped_column(db.Float, default=0.0) # 平均回答時間（秒）
+
+    user = relationship("User", back_populates="progress")
+    topic = relationship("Topic", back_populates="progress")
+
 
     user=relationship("User", back_populates="progress")
     topic=relationship("Topic", back_populates="progress")
@@ -66,6 +76,11 @@ def load_user(user_id):
 @app.route("/")
 def main():
     return render_template("user/application.html")
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -192,7 +207,7 @@ def review():
     q1.update_q_value(current_question_index, reward, next_question)
     session['current_question'] = next_question
 
-    if 'currenr_question_index' not in session['solved_questions']:
+    if 'current_question_index' not in session['solved_questions']:
         session['solved_questions'].append(current_question_index)
 
     total_solved = len(session['solved_questions'])
@@ -221,7 +236,74 @@ def all_mode():
     session['solved_questions'] = []   # 解答した問題をリセット
     return redirect(url_for('quiz'))  # 出題画面にリダイレクト
 
+#進捗の可視化
+@app.route("/progress")
+def progress():
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
+
+    progress_data = db.session.query(
+        LearningProgress.topic_id, 
+        db.func.sum(LearningProgress.correct_count),
+        db.func.sum(LearningProgress.total_count)
+    ).filter_by(user_id=current_user.id).group_by(LearningProgress.topic_id).all()
+
+    topic_names = []
+    accuracy = []
+
+    for topic_id, correct, total in progress_data:
+        topic = Topic.query.get(topic_id)
+        topic_names.append(topic.name)
+        accuracy.append(round(correct / total * 100, 1) if total > 0 else 0)
+
+    return render_template("main/progress.html", labels=topic_names, data=accuracy)
+
+
+
+
+#チャットボット君
+chatbot = pipeline("text-generation", model="microsoft/DialoGPT-medium")
+
+def get_wikipedia_summary(query):
+    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{query}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return data.get("extract", "情報を取得できませんでした。")
+    except requests.exceptions.RequestException as e:
+        return "Wikipedia APIの取得に失敗しました。"
+
+@app.route("/chat", methods=["GET", "POST"])
+def chat():
+    if 'chat_messages' not in session:
+        session['chat_messages'] = []
+
+    if request.method == "POST":
+        user_message = request.json.get("message")
+
+        # Wikipedia APIを利用
+        if "とは" in user_message:
+            query = user_message.replace("とは", "").strip()
+            bot_response = get_wikipedia_summary(query)
+        else:
+            # 会話履歴をモデルの入力として渡す
+            conversation_history = " ".join([msg['text'] for msg in session['chat_messages']])
+            input_text = conversation_history + " " + user_message
+            bot_response = chatbot(input_text, max_length=100, pad_token_id=50256, temperature=0.7, top_p=0.9)[0]['generated_text']
+
+        # 会話履歴を追加
+        session['chat_messages'].append({"sender": "あなた", "text": user_message})
+        session['chat_messages'].append({"sender": "Bot", "text": bot_response})
+
+        # 履歴を制限する（最大10件）
+        MAX_HISTORY = 10
+        if len(session['chat_messages']) > MAX_HISTORY:
+            session['chat_messages'] = session['chat_messages'][-MAX_HISTORY:]
+
+        return jsonify({"response": bot_response})
+
+    return render_template("main/chat.html", chat_messages=session['chat_messages'])
 
 if __name__ == "__main__":
-   
     app.run(debug=True)
