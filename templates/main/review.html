@@ -19,12 +19,6 @@
         <form action="/next_question" method="post">
             <button type="submit">次の問題へ</button>
         </form>
-        <h3>セクションごとの正答率</h3>
-        <ul>
-            {% for section, acc in section_accuracy.items() %}
-                <li>{{ section }}: {{ acc }}%</li>
-            {% endfor %}
-        </ul>
     </div>
     {% endblock %}
 </body>
