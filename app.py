@@ -12,6 +12,7 @@ from transformers import pipeline
 from questions import questions
 from QLearning import QLearning
 from flask_login import logout_user
+import speech_recognition as sr
 import numpy as np
 import requests
 import datetime
@@ -258,12 +259,25 @@ def progress():
 
     return render_template("main/progress.html", labels=topic_names, data=accuracy)
 
+#音声認識機能
+recognizer = sr.Recognizer()
 
+def listen_to_audio():
+    with sr.Microphone() as source:
+        print("聞いています...")
+        audio = recognizer.listen(source)
+    try:
+        print("認識したテキスト: " + recognizer.recognize_google(audio, language="ja-JP"))
+        return recognizer.recognize_google(audio, language="ja-JP")
+    except sr.UnknownValueError:
+        return "聞き取れませんでした"
+    except sr.RequestError as e:
+        return "音声認識サービスに接続できませんでした"
 
-
-#チャットボット君
+# チャットボット
 chatbot = pipeline("text-generation", model="microsoft/DialoGPT-medium")
 
+# Wikipedia APIを利用して情報を取得
 def get_wikipedia_summary(query):
     url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{query}"
     try:
@@ -274,6 +288,7 @@ def get_wikipedia_summary(query):
     except requests.exceptions.RequestException as e:
         return "Wikipedia APIの取得に失敗しました。"
 
+# チャット処理
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
     if 'chat_messages' not in session:
@@ -281,6 +296,10 @@ def chat():
 
     if request.method == "POST":
         user_message = request.json.get("message")
+
+        # 音声入力を処理する場合
+        if user_message == "音声で入力":
+            user_message = listen_to_audio()  # 音声認識
 
         # Wikipedia APIを利用
         if "とは" in user_message:
