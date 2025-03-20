@@ -73,27 +73,27 @@ button[type="submit"]:hover {
     background-color: #1a057a;
 }
 
-/* 「復習する」ボタン */
-.incorrect_mode_button {
-    width: auto;               /* 幅を自動調整 */
-    display: flex;             /* flexboxで配置 */
-    justify-content: center;   /* 水平中央寄せ */
-    margin-top: 20px;          /* 上に余白を追加 */
+/* モードボタンを横並びにする */
+.modechange {
+    display: flex;                    /* 横並びにする */
+    gap: 10px;                         /* ボタン間の隙間を10pxに設定 */
+    margin-top: 20px;                  /* 上に余白を追加 */
+    width: 100%;                       /* 親要素の幅いっぱいにする */
+    justify-content: center;
 }
 
 /* ボタンのスタイル */
-.incorrect_mode_button button {
-    width: 40%;                /* 幅を40%に設定 */
+.mode_button button {                     
+    width: 100%;                        /* 幅を48%に設定（間隔を考慮して） */
     background-color: #133db1;
     color: white;
-    text-align: center;        /* テキストを中央寄せ */
-    padding: 12px;             /* ボタン内のパディング */
+    text-align: center;                /* テキストを中央寄せ */
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.incorrect_mode_button button:hover {
-    background-color: #1a057a; /* ホバー時に少し暗くなる */
+.mode_button button:hover {
+    background-color: #1a057a;         /* ホバー時に少し暗くなる */
 }

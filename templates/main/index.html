@@ -21,11 +21,14 @@
                 <button type="submit">スタート</button>
             </form>
         </div>
-
-        <!-- 間違えた問題を復習するフォーム -->
-        <form method="POST" class="incorrect_mode_button" action="{{ url_for('incorrect_mode') }}">
-            <button type="submit">間違えた問題を復習する</button>
-        </form>
+        <div class="modechange">
+            <form method="POST" class="mode_button" action="{{ url_for('incorrect_mode') }}">
+                <button type="submit">間違えた問題</button>
+            </form>
+            <form method="POST" class="mode_button" action="{{ url_for('all_mode') }}">
+                <button type="submit">ランダムモード</button>
+            </form>
+        </div>
     {% endblock %}
 </body>
 </html>

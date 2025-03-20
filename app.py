@@ -215,6 +215,13 @@ def incorrect_mode():
     session['solved_questions'] = []
     return redirect(url_for('quiz'))
 
+@app.route('/all_mode', methods=['POST'])
+def all_mode():
+    session['incorrect_mode'] = False  # 間違えた問題モードを無効にする
+    session['solved_questions'] = []   # 解答した問題をリセット
+    return redirect(url_for('quiz'))  # 出題画面にリダイレクト
+
+
 if __name__ == "__main__":
    
     app.run(debug=True)
