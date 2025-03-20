@@ -15,6 +15,7 @@ import datetime
 import os
 import math
 import random
+import time
 
 
 app = Flask(__name__)
@@ -148,25 +149,58 @@ q1 = QLearning(num_questions)
 def select_question():
     if 'solved_questions' not in session:
         session['solved_questions'] = []     
+        
     if 'incorrect_questions' not in session:
         session['incorrect_questions'] = []
 
+    selected_set = session.get('selected_set', None)
+    if not selected_set:
+        return redirect(url_for('index'))
+    
+    available_questions = get_questions_by_set(selected_set)
+    total_questions = len(available_questions)
+
     if session.get('incorrect_mode', False):
-        unanswered_questions = [i for i in session['incorrect_questions'] if i not in session['solved_questions']]
+        unanswered_questions = [q['id'] for q in available_questions if q['id'] in session['incorrect_questions'] and q['id'] not in session['solved_questions']]
     else:
-        unanswered_questions = list(range(len(questions)))
-    if unanswered_questions:
-        return random.choice(unanswered_questions)
-    else:
-        return random.choice(range(len(questions)))
+        unanswered_questions = [q['id'] for q in available_questions if q['id'] not in session['solved_questions']]
+
+    return random.choice(unanswered_questions) if unanswered_questions else None
               
 @app.route('/quiz',methods=['GET'])
 def quiz():
+    if 'selected_set' not in session:
+        return redirect(url_for('index'))  # 問題セットが未選択ならトップへ戻す
+
+    selected_set = session['selected_set']
+    available_questions = get_questions_by_set(selected_set)
+
     if 'current_question' not in session:
-        session['current_question'] = int(select_question())
+        selected_question = select_question()
+        
+        if selected_question is None:  # すべて解かれている場合
+            return redirect(url_for('result')) 
+        
+        session['current_question'] = selected_question
+        session['solved_questions'] = []
+        session['correct_answers'] = 0
+        session['incorrect_questions'] = []
+        session['progress'] = []
+        session['start_time'] = time.time()
+        session['incorrect_mode'] = False
 
     current_question_index = int(session['current_question'])
     current_question = questions[current_question_index]
+
+    if session['current_question'] is None:
+        return redirect(url_for('result'))  
+
+    if session.get('incorrect_mode', False):
+        unanswered_questions = [q for q in session['incorrect_questions'] if q not in session['solved_questions']]
+        if unanswered_questions:
+            session['current_question'] = unanswered_questions[0]
+        else:
+            return redirect(url_for('result'))
 
     # 'question_0'の問題がすべて解かれたかを確認
     question_0_questions = [q for q in questions if q['select_set'] == 'question_0']
@@ -174,7 +208,15 @@ def quiz():
 
     # 'question_0'のすべての問題が解かれたらresultページにリダイレクト
     if len(solved_question_indices) == len(question_0_questions):
-        return redirect(url_for('result'))  # ここでresultページにリダイレクト
+        session['solved_questions'] = []
+        return redirect(url_for('result')) 
+
+    question_1_questions = [q for q in questions if q['select_set'] == 'question_1']
+    solved_question_indices_1 = [q['id'] for q in question_1_questions if q['id'] in session.get('solved_questions', [])]
+
+    # 'question_1'のすべての問題が解かれたらresultページにリダイレクト
+    if len(solved_question_indices_1) == len(question_1_questions):
+        return redirect(url_for('result')) 
     
     return render_template('main/quiz.html', question = current_question)
 
@@ -186,22 +228,39 @@ def review():
     current_question = questions[current_question_index]
     correct_answer = current_question["answer"]
 
+    start_time = session.get('start_time', time.time())
+    time_spent = round(time.time() - start_time, 2)
+    session['start_time'] = time.time()
+
     # 正解の場合と不正解の場合の処理
     if selected_answer == correct_answer:
         feedback = "正解です！！"
         reward = -1
-        session['correct_answers'] = session.get('correct_answers', 0) + 1
+        if not session.get('incorrect_mode', False):
+            session['correct_answers'] = session.get('correct_answers', 0) + 1
     else:
         feedback = "不正解です!!"
         reward = 1
         if current_question_index not in session['incorrect_questions']:
             session['incorrect_questions'].append(current_question_index)
 
-    # 次の問題を選択
-    next_question = int(select_question())
-    q1.update_q_value(current_question_index, reward, next_question)
-    session['current_question'] = next_question
+    #進捗データの記録
+    session.setdefault('progress', [])
+    session['progress'].append({
+        'question_id': current_question_index,
+        'selected_answer':selected_answer,
+        'correct': selected_answer == correct_answer,
+        'time_spent': time_spent,
+        'section': current_question['select_set']
+    })
 
+    # 次の問題を選択
+    next_question = select_question()
+    if next_question is not None:
+        q1.update_q_value(current_question_index, reward, next_question)
+        session['current_question'] = next_question
+    else:
+        return redirect(url_for('result'))
     # 解答済み問題リストに現在の問題を追加
     if current_question_index not in session['solved_questions']:
         session['solved_questions'].append(current_question_index)
@@ -216,11 +275,26 @@ def review():
     else:
         accuracy = 0  # 解答がない場合は0%
 
+    section_accuracy = {}
+    section_counts = {}
+
+    for progress in session['progress']:
+        section = progress['section']
+        if section not in section_accuracy:
+            section_accuracy[section] = 0
+            section_counts[section] = 0
+        if progress['correct']:
+            section_accuracy[section] += 1
+        section_counts[section] += 1
+
+    for section in section_accuracy:
+        section_accuracy[section] = round((section_accuracy[section] / section_counts[section]) * 100, 1)
+
     session.modified = True
 
     return render_template('main/review.html', question=current_question, feedback=feedback, 
                            explanation=current_question["explanation"], solved_count=len(session['solved_questions']),
-                           total_questions=len(questions), accuracy=accuracy)
+                           total_questions=len(questions), accuracy=accuracy,section_accuracy=section_accuracy)
 
 
 @app.route('/next_question', methods=['POST'])
@@ -240,13 +314,17 @@ def result():
         accuracy = round((correct_answers / total_questions) * 100, 1)
     else:
         accuracy = 0
-    
-    return render_template('main/result.html', total_questions = total_questions, correct_answers = correct_answers, accuracy = accuracy)
+
+    incorrect_questions = session.get('incorrect_questions', [])
+    incorrect_questions_details = [questions[i] for i in incorrect_questions]
+
+    return render_template('main/result.html', total_questions = total_questions, correct_answers = correct_answers, accuracy = accuracy,incorrect_questions_details = incorrect_questions_details)
 
 @app.route('/incorrect_mode',methods=['POST'])
 def incorrect_mode():
     session['incorrect_mode'] = True
     session['solved_questions'] = []
+    session['current_question'] = session['incorrect_questions'][0]
     return redirect(url_for('quiz'))
 
 if __name__ == "__main__":
