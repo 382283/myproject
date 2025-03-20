@@ -171,10 +171,16 @@ def select_question():
         unanswered_questions = [i for i in session['incorrect_questions'] if i not in session['solved_questions']]
     else:
         unanswered_questions = list(range(len(questions)))
+
     if unanswered_questions:
-        return random.choice(unanswered_questions)
+        next_question = random.choice(unanswered_questions)
     else:
-        return random.choice(range(len(questions)))
+        next_question = random.choice(range(len(questions)))
+    
+    if not session.get('incorrect_mode', False):
+        next_question = next_question = q1.select_action()
+
+    return next_question
               
 @app.route('/quiz',methods=['GET'])
 def quiz():
@@ -225,17 +231,20 @@ def next_question():
     session['current_question'] = int(select_question())
     return redirect(url_for('quiz'))
 
-@app.route('/incorrect_mode',methods=['POST'])
+@app.route('/incorrect_mode', methods=['POST'])
 def incorrect_mode():
     session['incorrect_mode'] = True
-    session['solved_questions'] = []
+    session['solved_questions'] = []  # 既に解いた問題をリセット
+    if 'incorrect_questions' not in session:
+        session['incorrect_questions'] = []
     return redirect(url_for('quiz'))
 
 @app.route('/all_mode', methods=['POST'])
 def all_mode():
-    session['incorrect_mode'] = False  # 間違えた問題モードを無効にする
-    session['solved_questions'] = []   # 解答した問題をリセット
-    return redirect(url_for('quiz'))  # 出題画面にリダイレクト
+    session['incorrect_mode'] = False
+    session['solved_questions'] = []
+    session['incorrect_questions'] = []  # 間違えた問題リストもリセット
+    return redirect(url_for('quiz'))
 
 #進捗の可視化
 @app.route("/progress")
