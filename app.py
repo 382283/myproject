@@ -168,6 +168,14 @@ def quiz():
     current_question_index = int(session['current_question'])
     current_question = questions[current_question_index]
 
+    # 'question_0'の問題がすべて解かれたかを確認
+    question_0_questions = [q for q in questions if q['select_set'] == 'question_0']
+    solved_question_indices = session.get('solved_questions', [])
+
+    # 'question_0'のすべての問題が解かれたらresultページにリダイレクト
+    if len(solved_question_indices) == len(question_0_questions):
+        return redirect(url_for('result'))  # ここでresultページにリダイレクト
+    
     return render_template('main/quiz.html', question = current_question)
 
 @app.route('/review', methods=['POST'])
@@ -219,6 +227,21 @@ def review():
 def next_question():
     session['current_question'] = int(select_question())
     return redirect(url_for('quiz'))
+
+@app.route('/result', methods=['GET'])
+def result():
+    solved_question_indices = session.get('solved_questions', [])
+    correct_answers = session.get('correct_answers', 0)
+
+    question_0_questions = [q for q in questions if q['select_set'] == 'question_0']
+    total_questions = len(question_0_questions)
+
+    if total_questions > 0:
+        accuracy = round((correct_answers / total_questions) * 100, 1)
+    else:
+        accuracy = 0
+    
+    return render_template('main/result.html', total_questions = total_questions, correct_answers = correct_answers, accuracy = accuracy)
 
 @app.route('/incorrect_mode',methods=['POST'])
 def incorrect_mode():

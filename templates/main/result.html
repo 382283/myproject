@@ -1,0 +1,20 @@
+<!-- result.html -->
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>結果</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/result.css') }}">
+    </head>
+<body>
+    {% extends "main/logined.html" %}
+        {% block content %}
+            <h1>結果</h1>
+            <p>総問題数: {{ total_questions }}</p>
+            <p>正解数: {{ correct_answers }}</p>
+            <p>正答率: {{ accuracy }}%</p>
+            
+            <a href="{{ url_for('index') }}">トップに戻る</a>
+        {% endblock %}
+</body>
+</html>
