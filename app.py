@@ -8,10 +8,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import LoginManager, UserMixin, login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
+from keybert import KeyBERT
 from questions import questions
 from QLearning import QLearning
 from flask_login import logout_user
+from googletrans import Translator
 import speech_recognition as sr
 import numpy as np
 import requests
@@ -152,6 +154,11 @@ def index():
     if request.method == 'POST':
         session['selected_set'] = request.form['select_set']
         session['incorrect_mode'] = False
+        # セッションに残るべきデータを保持
+        if 'solved_questions' not in session:
+            session['solved_questions'] = []
+        if 'incorrect_questions' not in session:
+            session['incorrect_questions'] = []
         return redirect(url_for('quiz'))
     return render_template("main/index.html")
 
@@ -181,16 +188,27 @@ def select_question():
         next_question = next_question = q1.select_action()
 
     return next_question
-              
-@app.route('/quiz',methods=['GET'])
+
+
+@app.route('/quiz', methods=['GET', 'POST'])           
 def quiz():
+    # 現在選択されているモード（セット）の取得
+    selected_set = session.get('selected_set')
+    questions_in_set = get_questions_by_set(selected_set)
+    
+    # すべての問題を解いたかどうかを確認
+    if 'solved_questions' in session and len(session['solved_questions']) == len(questions_in_set):
+        # すべての問題が解かれた場合、結果画面に遷移
+        return redirect(url_for('result'))
+    
     if 'current_question' not in session:
         session['current_question'] = int(select_question())
 
     current_question_index = int(session['current_question'])
     current_question = questions[current_question_index]
 
-    return render_template('main/quiz.html', question = current_question)
+    return render_template('main/quiz.html', question=current_question)
+
 
 @app.route('/review', methods=['POST'])
 def review():
@@ -225,6 +243,28 @@ def review():
 
     return render_template('main/review.html', question = current_question, feedback=feedback, explanation = current_question["explanation"],solved_count  = len(session['solved_questions']),total_questions = len(questions),accuracy=accuracy)
 
+#結果表示
+@app.route('/result')
+def result():
+    selected_set = session.get('selected_set')
+    questions_in_set = get_questions_by_set(selected_set)
+
+    # 解いた問題数
+    total_solved = len(session.get('solved_questions', []))
+    
+    # 正解数
+    correct_answers = session.get('correct_answers', 0)
+    
+    # 精度（正解率）の計算
+    accuracy = round(correct_answers / total_solved * 100, 1) if total_solved > 0 else 0
+
+    return render_template('main/result.html', 
+                           total_solved=total_solved, 
+                           total_questions=len(questions_in_set),
+                           correct_answers=correct_answers, 
+                           accuracy=accuracy)
+
+
 
 @app.route('/next_question', methods=['POST'])
 def next_question():
@@ -253,20 +293,26 @@ def progress():
         return redirect(url_for("login"))
 
     progress_data = db.session.query(
-        LearningProgress.topic_id, 
-        db.func.sum(LearningProgress.correct_count),
-        db.func.sum(LearningProgress.total_count)
-    ).filter_by(user_id=current_user.id).group_by(LearningProgress.topic_id).all()
+    Topic.name,
+    db.func.sum(LearningProgress.correct_count).label("correct"),
+    db.func.sum(LearningProgress.total_count).label("total")
+    ).join(Topic, LearningProgress.topic_id == Topic.id
+    ).filter(LearningProgress.user_id == current_user.id
+    ).group_by(Topic.name).all()
 
-    topic_names = []
-    accuracy = []
+    # 正答率計算
+    processed_data = []
+    for topic, correct, total in progress_data:
+        accuracy = round(correct / total * 100, 1) if total else 0
+        processed_data.append({
+            'topic': topic,
+            'correct': correct,
+            'total': total,
+            'accuracy': accuracy
+        })
 
-    for topic_id, correct, total in progress_data:
-        topic = Topic.query.get(topic_id)
-        topic_names.append(topic.name)
-        accuracy.append(round(correct / total * 100, 1) if total > 0 else 0)
+    return render_template("main/progress.html", progress=processed_data)
 
-    return render_template("main/progress.html", labels=topic_names, data=accuracy)
 
 #音声認識機能
 recognizer = sr.Recognizer()
@@ -285,6 +331,7 @@ def listen_to_audio():
 
 # チャットボット
 chatbot = pipeline("text-generation", model="microsoft/DialoGPT-medium")
+translator = Translator()
 
 # Wikipedia APIを利用して情報を取得
 def get_wikipedia_summary(query):
@@ -293,7 +340,10 @@ def get_wikipedia_summary(query):
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        return data.get("extract", "情報を取得できませんでした。")
+        english_summary = data.get("extract", "情報を取得できませんでした。")
+        japanese_summary = translator.translate(english_summary, src="en", dest="ja").text
+
+        return japanese_summary
     except requests.exceptions.RequestException as e:
         return "Wikipedia APIの取得に失敗しました。"
 
@@ -309,6 +359,16 @@ def chat():
         # 音声入力を処理する場合
         if user_message == "音声で入力":
             user_message = listen_to_audio()  # 音声認識
+        #翻訳機能
+        if user_message.startswith("翻訳 英語:"):
+            original_text = user_message.replace("翻訳 英語:", "").strip()
+            translated_text = translator.translate(original_text, src="ja", dest="en").text
+            bot_response = f"英語訳: {translated_text}"
+
+        elif user_message.startswith("翻訳 日本語:"):
+            original_text = user_message.replace("翻訳 日本語:", "").strip()
+            translated_text = translator.translate(original_text, src="en", dest="ja").text
+            bot_response = f"日本語訳: {translated_text}"
 
         # Wikipedia APIを利用
         if "とは" in user_message:
@@ -332,6 +392,21 @@ def chat():
         return jsonify({"response": bot_response})
 
     return render_template("main/chat.html", chat_messages=session['chat_messages'])
+
+# tokenizer = AutoTokenizer.from_pertrained("sonoisa/t5-base-japanese")
+
+# model =AutoModelForSeq2SeqLM.from_pretrained("sonoisa/t5-base-japanese")
+
+# @app.route('/summarize', methods=['POST'])
+# def generate_summary():
+#     text = request.json['text']
+#     input_text = "summarize: " + text
+#     inputs = tokenizer.encode(input_text, return_tensors="pt", max_length=512, truncation=True)
+#     summary_ids = model.generate(inputs, max_length=100, num_beams=4, early_stopping=True)
+#     generated_text = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+#     return jsonify({'generated_summary': generated_text})
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

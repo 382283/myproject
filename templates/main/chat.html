@@ -1,147 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>音声認識チャットボット</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        #chat-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .chat-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .user-message {
-            background-color: #d1f7d6;
-            text-align: right;
-        }
-        .bot-message {
-            background-color: #e2e2e2;
-            text-align: left;
-        }
-        #input-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
-        #user-input {
-            width: 80%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        #send-btn, #voice-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #send-btn:hover, #voice-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='stylesheets/chat.css') }}"
+    />
+  </head>
+  <body>
+    <div id="chat-container">
+      <h2>音声認識チャットボット</h2>
 
-<div id="chat-container">
-    <h2>音声認識チャットボット</h2>
-    
-    <!-- チャット履歴表示 -->
-    <div id="chat-history">
-        <!-- 会話内容がここに表示されます -->
-    </div>
+      <!-- チャット履歴表示 -->
+      <div id="chat-history"></div>
 
-    <!-- ユーザー入力エリア -->
-    <div id="input-area">
-        <input type="text" id="user-input" placeholder="メッセージを入力してください..." />
+      <!-- ユーザー入力エリア -->
+      <div id="input-area">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="メッセージを入力してください..."
+        />
         <button id="send-btn">送信</button>
         <button id="voice-btn">音声で入力</button>
+      </div>
     </div>
-</div>
 
-<script>
-    const sendBtn = document.getElementById("send-btn");
-    const voiceBtn = document.getElementById("voice-btn");
-    const userInput = document.getElementById("user-input");
-    const chatHistory = document.getElementById("chat-history");
-
-    // チャット履歴にメッセージを追加
-    function addMessage(sender, message) {
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("chat-message", sender === "user" ? "user-message" : "bot-message");
-        messageDiv.textContent = message;
-        chatHistory.appendChild(messageDiv);
-        chatHistory.scrollTop = chatHistory.scrollHeight; // スクロールを最下部に
-    }
-
-    // 音声認識
-    function listenToAudio() {
-        // Web Speech APIを使用した音声認識
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = "ja-JP";
-        
-        recognition.onstart = function() {
-            console.log("音声認識を開始しました...");
-        };
-        
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            userInput.value = transcript;
-            sendMessage();
-        };
-
-        recognition.onerror = function(event) {
-            alert("音声認識エラー: " + event.error);
-        };
-
-        recognition.start();
-    }
-
-    // 送信ボタンが押された時
-    function sendMessage() {
-        const message = userInput.value.trim();
-        if (message !== "") {
-            addMessage("user", message);  // ユーザーのメッセージを表示
-            userInput.value = "";
-
-            // サーバーにメッセージを送信
-            fetch("/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ message: message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                addMessage("bot", data.response);  // ボットの返答を表示
-            })
-            .catch(error => console.error("エラー:", error));
-        }
-    }
-
-    // 送信ボタンのクリックイベント
-    sendBtn.addEventListener("click", sendMessage);
-
-    // 音声入力ボタンのクリックイベント
-    voiceBtn.addEventListener("click", listenToAudio);
-</script>
-
-</body>
+    <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+  </body>
 </html>
